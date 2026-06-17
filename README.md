@@ -1,136 +1,84 @@
-# DIO Spring Boot Learning Track
+# DIO Spring Boot - Projeto Final 05: Spring AI (Budgeting API)
 
-This repository contains a DIO Spring Boot learning track organized as incremental modules.
+## Introdução
 
-The track starts with architecture foundations and progressively moves through web APIs, data access, security, service integration, and AI-enabled workflows.
+Este projeto aplica Spring AI em uma API de controle financeiro (budgeting), mantendo a arquitetura em camadas utilizada ao longo do bootcamp.
 
-<img width="2752" height="1536" alt="unnamed" src="https://github.com/user-attachments/assets/a7bcbe19-4d0c-4395-8696-8c64be22764f" />
-
-## Modules
-
-- [`00-domain-driven-design`](00-domain-driven-design/README.md)  
-  DDD foundations with a catalog domain and no web layer.
-- [`01-spring-web`](01-spring-web/README.md)  
-  REST API design with Spring Web and API documentation with Spring REST Docs.
-- [`02-spring-data`](02-spring-data/README.md)  
-  Data access in a multi-context application using MySQL, MongoDB, Redis, and PostgreSQL.
-- [`03-spring-security`](03-spring-security/README.md)  
-  Authentication and authorization with Spring Security in a proposal management API.
-- [`04-spring-cloud-openfeign`](04-spring-cloud-openfeign/README.md)  
-  External service integration (KYC/AML) using Spring Cloud OpenFeign and resilience patterns.
-- [`05-spring-ai`](05-spring-ai/README.md)  
-  Final project using Spring AI for speech-to-text, tool calling, and text-to-speech.
-
-## Recommended Study Order
-
-1. [`00-domain-driven-design`](00-domain-driven-design/README.md)
-2. [`01-spring-web`](01-spring-web/README.md)
-3. [`02-spring-data`](02-spring-data/README.md)
-4. [`03-spring-security`](03-spring-security/README.md)
-5. [`04-spring-cloud-openfeign`](04-spring-cloud-openfeign/README.md)
-6. [`05-spring-ai`](05-spring-ai/README.md)
+O objetivo é integrar recursos de inteligência artificial sem quebrar as regras de domínio e separação de responsabilidades.
 
 ---
 
-## Shared Architecture Guide
+## Fluxo da aplicação
 
-The sections below consolidate architecture topics that are intentionally reused across modules.
-
-### DDD Layered Architecture
-
-Most modules follow the same conceptual split:
-
-```text
-domain/          -> business model, invariants, contracts
-application/     -> use cases, orchestration, application policies
-infrastructure/  -> adapters (HTTP, persistence, external clients, framework glue)
-```
-
-Why this matters:
-
-- `domain` stays focused on business language and rules, not framework details.
-- `application` coordinates domain behavior for specific user/business actions.
-- `infrastructure` can change (database, web transport, external APIs) without forcing core business rewrites.
-
-This separation reduces coupling and supports long-term maintainability.
-
-### Java Class vs Java Record in Domain Modeling
-
-A practical guideline used across the track:
-
-- Use `class` for entities/aggregates that have identity and may evolve behavior over time.
-- Use `record` for immutable value objects and DTO-style transport models.
-
-Design trade-offs:
-
-- `class` supports richer lifecycle behavior and controlled mutation.
-- `record` reduces boilerplate and makes immutability explicit.
-
-This distinction improves code intent and keeps domain concepts clearer.
-
-### Strong Typed Identifiers
-
-Instead of passing raw primitives (`UUID`, `String`) everywhere, modules wrap identifiers in explicit types such as `BookId`, `TaskId`, `ProposalId`, and `TransactionId`.
-
-Benefits:
-
-- Better compile-time safety (fewer accidental ID mix-ups).
-- More expressive signatures (`findById(TaskId id)` communicates intent).
-- Cleaner evolution path for ID rules and validation.
-
-### Repository Pattern
-
-The repository contract belongs to the business side, while technology-specific implementations stay in infrastructure.
-
-Pattern used in this repository:
-
-- Domain contract: `XxxRepository` in `domain/`.
-- Adapter implementation: JPA/in-memory/etc. in `infrastructure/`.
-
-Architectural impact:
-
-- Business logic depends on abstractions, not persistence frameworks.
-- Switching storage technology becomes an adapter change, not a domain rewrite.
-- Unit testing use cases becomes simpler with fake/mock repositories.
-
-### Use Cases and Clean Architecture
-
-Each use case models one business capability (for example, create task, list proposals, analyze company risk).
-
-Common flow:
-
-1. Controller/listener receives an external request.
-2. It calls one application use case.
-3. The use case orchestrates domain objects and repository/gateway contracts.
-4. Infrastructure adapters handle persistence or external integrations.
-
-Why this is important:
-
-- Strong single-responsibility boundaries.
-- Easier testability and refactoring.
-- Better readability of business workflows.
-
-### Docker Compose Support in Development
-
-Several modules include `compose.yml` and Spring Boot Docker Compose support.
-
-Typical local development role:
-
-- Start required infra services (database/cache/message dependencies).
-- Keep local setup reproducible for all students.
-- Reduce onboarding friction by standardizing environment dependencies.
-
-Note: exact behavior can vary by module configuration and runtime profile.
+1. O cliente envia um arquivo de áudio.
+2. O áudio é transcrito para texto.
+3. O modelo de IA interpreta o comando e escolhe uma ferramenta (use case).
+4. O use case executa a regra de negócio (persistir ou consultar transações).
+5. A resposta final é convertida em áudio novamente.
 
 ---
 
-## Quick Start
+## Estrutura do projeto
 
-Choose a module and run its local instructions:
+- `domain`
+  - Entidades e contratos de repositório.
 
-```bash
-cd 01-spring-web
+- `application`
+  - Casos de uso reutilizados por REST e IA.
+
+- `infrastructure`
+  - Controllers HTTP, integração com banco e serviços externos.
+
+---
+
+## Funcionalidades de IA
+
+### Speech-to-text
+- Utiliza `TranscriptionModel` para converter áudio em texto.
+
+### Tool Calling
+- `ChatClient` expõe os use cases como ferramentas da IA.
+- Métodos anotados com `@Tool`.
+
+### Text-to-speech
+- `TextToSpeechModel` transforma resposta em áudio MP3.
+
+---
+
+## Endpoints da API
+
+### Criar transação
+```http
+POST /transactions
+{
+  "description": "Mercado",
+  "amount": 100,
+  "category": "GROCERIES"
+}
+Listar transações por categoria
+GET /transactions/GROCERIES
+Total por categoria
+GET /transactions/total/GROCERIES
+Endpoint com IA (áudio)
+POST /transactions/ai
+Como executar
+export OPENAI_API_KEY="sua_chave_aqui"
+./gradlew bootRun
 ./gradlew test
-```
+Observações
+Projeto educacional com foco em Spring AI e arquitetura limpa.
+Integra integração de IA sem quebrar separação de camadas.
 
-For module-specific details, always check each module README from the links above.
+---
+
+# 💡 Resposta direta pra sua dúvida
+
+- ❌ não apaga tudo “no escuro”
+- ✔ pode substituir com versão melhor
+- ✔ pode deixar em português sim
+- ✔ seu projeto fica mais fácil de avaliar
+
+---
+
+Se quiser, próximo passo eu posso te ajudar a:
+👉 deixar isso “nível destaque de recrutador” com badges, imagens e layout 
