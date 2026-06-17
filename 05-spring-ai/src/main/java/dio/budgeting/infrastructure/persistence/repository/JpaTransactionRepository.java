@@ -10,9 +10,12 @@ import java.util.List;
 
 @Repository
 public class JpaTransactionRepository implements TransactionRepository {
+
     private final TransactionEntityRepository transactionEntityRepository;
 
-    public JpaTransactionRepository(TransactionEntityRepository transactionEntityRepository) {
+    public JpaTransactionRepository(
+            TransactionEntityRepository transactionEntityRepository
+    ) {
         this.transactionEntityRepository = transactionEntityRepository;
     }
 
@@ -24,9 +27,15 @@ public class JpaTransactionRepository implements TransactionRepository {
 
     @Override
     public List<Transaction> findAllByCategory(Category category) {
-        return transactionEntityRepository.findAllByCategory(category)
+        return transactionEntityRepository
+                .findAllByCategory(category)
                 .stream()
                 .map(TransactionEntity::toDomain)
                 .toList();
+    }
+
+    @Override
+    public long getTotalByCategory(Category category) {
+        return transactionEntityRepository.getTotalByCategory(category);
     }
 }
