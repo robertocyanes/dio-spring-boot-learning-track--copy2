@@ -1,53 +1,67 @@
-# DIO Spring Boot - Projeto Final 05: Spring AI (Budgeting API)
+# 💰 Budgeting API + Spring AI
 
-## Introdução
-
-Este projeto aplica Spring AI em uma API de controle financeiro (budgeting), mantendo a arquitetura em camadas utilizada ao longo do bootcamp.
-
-O objetivo é integrar recursos de inteligência artificial sem quebrar as regras de domínio e separação de responsabilidades.
+API de controle financeiro com integração de Inteligência Artificial usando Spring AI.  
+Projeto desenvolvido como parte do bootcamp DIO Spring Boot, aplicando arquitetura limpa, DDD e tool calling com LLM.
 
 ---
 
-## Fluxo da aplicação
+# 🚀 Visão geral
 
-1. O cliente envia um arquivo de áudio.
-2. O áudio é transcrito para texto.
-3. O modelo de IA interpreta o comando e escolhe uma ferramenta (use case).
-4. O use case executa a regra de negócio (persistir ou consultar transações).
-5. A resposta final é convertida em áudio novamente.
+A aplicação permite:
 
----
-
-## Estrutura do projeto
-
-- `domain`
-  - Entidades e contratos de repositório.
-
-- `application`
-  - Casos de uso reutilizados por REST e IA.
-
-- `infrastructure`
-  - Controllers HTTP, integração com banco e serviços externos.
+- Criar transações financeiras
+- Consultar transações por categoria
+- Calcular total por categoria
+- Processar comandos via IA (texto e áudio)
+- Converter áudio → texto → ação → áudio de resposta
 
 ---
 
-## Funcionalidades de IA
+# 🧠 Arquitetura
 
-### Speech-to-text
-- Utiliza `TranscriptionModel` para converter áudio em texto.
+O projeto segue arquitetura em camadas:
 
-### Tool Calling
-- `ChatClient` expõe os use cases como ferramentas da IA.
-- Métodos anotados com `@Tool`.
 
-### Text-to-speech
-- `TextToSpeechModel` transforma resposta em áudio MP3.
+domain → application → infrastructure
+
+
+### 📦 Domain
+- Entidades de negócio
+- Repositórios (contratos)
+
+### ⚙️ Application
+- Use Cases (regras de negócio)
+- Reutilizados por REST e IA
+
+### 🌐 Infrastructure
+- Controllers REST
+- Integração com banco (JPA)
+- Integração com Spring AI
 
 ---
 
-## Endpoints da API
+# 🤖 Integração com IA
 
-### Criar transação
+A aplicação utiliza Spring AI para:
+
+### 🎙 Speech-to-Text
+- Transcrição de áudio usando `TranscriptionModel`
+
+### 🧠 Tool Calling (ChatClient)
+A IA pode chamar diretamente os use cases:
+
+- Criar transação
+- Listar transações
+- Calcular totais por categoria
+
+### 🔊 Text-to-Speech
+- Respostas da IA são convertidas em áudio MP3 via `TextToSpeechModel`
+
+---
+
+# 📡 Endpoints da API
+
+## ➕ Criar transação
 ```http
 POST /transactions
 {
@@ -55,30 +69,63 @@ POST /transactions
   "amount": 100,
   "category": "GROCERIES"
 }
-Listar transações por categoria
+📋 Listar por categoria
+GET /transactions/{category}
+
+Exemplo:
+
 GET /transactions/GROCERIES
-Total por categoria
+💵 Total por categoria
+GET /transactions/total/{category}
+
+Exemplo:
+
 GET /transactions/total/GROCERIES
-Endpoint com IA (áudio)
+🎧 Endpoint com IA (áudio)
 POST /transactions/ai
-Como executar
-export OPENAI_API_KEY="sua_chave_aqui"
+Fluxo:
+Envia áudio
+IA transcreve
+IA executa ações (tools)
+Gera resposta
+Converte resposta em áudio MP3
+
+🧪 Exemplos de uso (curl)
+Criar transação
+curl -X POST http://localhost:8080/transactions \
+-H "Content-Type: application/json" \
+-d '{"description":"Teste","amount":100,"category":"GROCERIES"}'
+Consultar total
+curl http://localhost:8080/transactions/total/GROCERIES
+
+🛠 Tecnologias
+Java 21
+Spring Boot 4
+Spring Data JPA
+Spring AI
+MySQL
+Docker Compose
+
+⚙️ Como executar
+1. Configurar variável de ambiente
+export OPENAI_API_KEY="sua_chave"
+2. Rodar aplicação
 ./gradlew bootRun
+3. Rodar testes
 ./gradlew test
-Observações
-Projeto educacional com foco em Spring AI e arquitetura limpa.
-Integra integração de IA sem quebrar separação de camadas.
 
----
+📌 Observações
+Projeto educacional com foco em arquitetura limpa + IA
+Tool calling respeita as regras de domínio (sem bypass de camada)
+Integração com IA feita via Spring AI ChatClient
+Banco gerenciado via Docker Compose
 
-# 💡 Resposta direta pra sua dúvida
+🏁 Status
+✔ Backend funcional
+✔ Integração com IA ativa
+✔ API REST completa
+✔ Arquitetura em camadas aplicada
+✔ Pronto para avaliação
 
-- ❌ não apaga tudo “no escuro”
-- ✔ pode substituir com versão melhor
-- ✔ pode deixar em português sim
-- ✔ seu projeto fica mais fácil de avaliar
 
----
-
-Se quiser, próximo passo eu posso te ajudar a:
-👉 deixar isso “nível destaque de recrutador” com badges, imagens e layout 
+Projeto desenvolvido como parte do bootcamp DIO Spring Boot + AI
