@@ -1,7 +1,7 @@
-# 💰 Budgeting API + Spring AI
+# 💰  Spring AI Budgeting API (DIO - Spring Boot Bootcamp)
 
 API de controle financeiro com integração de Inteligência Artificial usando Spring AI.  
-Projeto desenvolvido como parte do bootcamp DIO Spring Boot, aplicando arquitetura limpa, DDD e tool calling com LLM.
+Projeto desenvolvido como parte do bootcamp Santander DIO, aplicando arquitetura limpa, DDD e tool calling com LLM.
 
 ---
 
